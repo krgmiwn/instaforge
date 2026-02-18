@@ -6,7 +6,8 @@ const http = require('http');
 const { URL } = require('url');
 
 const app = express();
-const PORT = 3000;
+// Support dynamic port for cloud hosting services like Render or Heroku
+const PORT = process.env.PORT || 3000;
 
 // Internal state
 let CONFIG = {
@@ -106,6 +107,20 @@ async function proxiedRequest(targetUrl, options = {}, body = null) {
         connectReq.end();
     });
 }
+
+// Root landing page for verification
+app.get('/', (req, res) => {
+    res.send(`
+        <div style="font-family: sans-serif; padding: 50px; text-align: center;">
+            <h1 style="color: #2563eb;">🚀 InstaForge Node Active</h1>
+            <p>Your backend bridge is running successfully.</p>
+            <p style="color: #64748b; font-size: 14px;">Use this URL in your Frontend Settings.</p>
+            <div style="background: #f1f5f9; padding: 15px; border-radius: 10px; display: inline-block; margin-top: 20px; font-family: monospace;">
+                ${req.protocol}://${req.get('host')}
+            </div>
+        </div>
+    `);
+});
 
 // Health & Proxy Status
 app.get('/v1/health', async (req, res) => {
